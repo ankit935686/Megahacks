@@ -22,3 +22,6 @@ def signup_view(request):
 @login_required
 def home(request):
     return render(request, 'students/home.html')
+
+
+
