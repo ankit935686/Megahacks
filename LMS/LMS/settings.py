@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'core',
     'mpcoding',
+    'instructor',
+    'roadmap',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -126,6 +130,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+
+
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -161,3 +176,24 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 GEMINI_API_KEY = 'AIzaSyBoSh27de1rMnal3wr7AGRuayGZxz06blg'
+# Add these lines to your settings.py
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'roadmap': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

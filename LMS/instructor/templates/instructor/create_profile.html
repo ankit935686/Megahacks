@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile-creation">
+    <h2>Create Your Instructor Profile</h2>
+    <p>Please complete your profile to access the dashboard.</p>
+    
+    <form method="post" enctype="multipart/form-data" class="profile-form">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+        <div class="error-message">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+            {{ form.full_name }}
+            {{ form.full_name.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.profile_picture.id_for_label }}">Profile Picture</label>
+            {{ form.profile_picture }}
+            {{ form.profile_picture.errors }}
+            
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.contact_number.id_for_label }}">Contact Number</label>
+            {{ form.contact_number }}
+            {{ form.contact_number.errors }}
+        </div>
+
+        <div class="form-group">
+            <label>Areas of Expertise</label>
+            {{ form.expertise }}
+            {{ form.expertise.errors }}
+        </div>
+
+        <div class="form-group">
+            <label>Upload Resume</label>
+            {{ form.resume }}
+            {{ form.resume.errors }}
+        </div>
+          
+
+        <div class="form-group">
+            <label for="{{ form.years_of_experience.id_for_label }}">Years of Experience</label>
+            {{ form.years_of_experience }}
+            {{ form.years_of_experience.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.linkedin_profile.id_for_label }}">LinkedIn Profile (Optional)</label>
+            {{ form.linkedin_profile }}
+            {{ form.linkedin_profile.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.bio.id_for_label }}">Bio (Max 300 characters)</label>
+            {{ form.bio }}
+            {{ form.bio.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Profile</button>
+    </form>
+</div>
+{% endblock %} 
