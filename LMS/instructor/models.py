@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
@@ -33,3 +34,31 @@ class MentorshipSession(models.Model):
 
     def __str__(self):
         return f"Session: {self.instructor.username} with {self.student.username}"
+
+class InstructorProfile(models.Model):
+    EXPERTISE_CHOICES = [
+        ('AI', 'Artificial Intelligence'),
+        ('WEB', 'Web Development'),
+        ('DATA', 'Data Science'),
+        ('MOBILE', 'Mobile Development'),
+        ('CLOUD', 'Cloud Computing'),
+        ('DEVOPS', 'DevOps'),
+        ('SECURITY', 'Cybersecurity'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=100)
+    profile_picture = models.ImageField(upload_to='instructor_profiles/', null=True, blank=True)
+    resume = models.FileField(upload_to='instructor_resumes/', null=True, blank=True)
+    contact_number = models.CharField(max_length=15)
+    expertise = models.JSONField(help_text="Store multiple expertise areas")
+    years_of_experience = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(50)]
+    )
+    linkedin_profile = models.URLField(blank=True, null=True)
+    bio = models.TextField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.full_name}'s Profile"

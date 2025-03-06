@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
-from .models import MentorshipSlot, MentorshipSession
+from .models import MentorshipSlot, MentorshipSession, InstructorProfile
 from datetime import datetime, timedelta
+from .forms import InstructorProfileForm 
+
 
 
 
@@ -14,7 +16,12 @@ from datetime import datetime, timedelta
 
 @login_required
 def home(request):
-    return render(request, 'home.html')
+    # Check if user has a profile
+    try:
+        profile = request.user.instructorprofile
+        return render(request, 'home.html')
+    except InstructorProfile.DoesNotExist:
+        return redirect('instructor:create_profile')
 
 
 def login_view(request):
@@ -102,5 +109,40 @@ def session_detail(request, session_id):
         return redirect('instructor:mentorship_dashboard')
     
     return render(request, 'instructor/mentorship/session_detail.html', {'session': session})
+
+@login_required
+def create_profile(request):
+    # Check if profile already exists
+    try:
+        profile = request.user.instructorprofile
+        return redirect('instructor:home')
+    except InstructorProfile.DoesNotExist:
+        if request.method == 'POST':
+            form = InstructorProfileForm(request.POST, request.FILES)
+            if form.is_valid():
+                profile = form.save(commit=False)
+                profile.user = request.user
+                profile.save()
+                messages.success(request, 'Profile created successfully!')
+                return redirect('instructor:home')
+        else:
+            form = InstructorProfileForm(initial={'email': request.user.email})
+        
+        return render(request, 'instructor/create_profile.html', {'form': form})
+
+@login_required
+def edit_profile(request):
+    profile = get_object_or_404(InstructorProfile, user=request.user)
+    
+    if request.method == 'POST':
+        form = InstructorProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('instructor:home')
+    else:
+        form = InstructorProfileForm(instance=profile)
+    
+    return render(request, 'instructor/edit_profile.html', {'form': form})
 
 
