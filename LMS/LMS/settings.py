@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
     'core',
+    'mpcoding',
 ]
 
 MIDDLEWARE = [
@@ -158,3 +159,5 @@ SOCIALACCOUNT_PROVIDERS = {
         ]
     }
 }
+
+GEMINI_API_KEY = 'AIzaSyBoSh27de1rMnal3wr7AGRuayGZxz06blg'

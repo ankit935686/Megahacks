@@ -1,0 +1,173 @@
+{% extends 'students/base.html' %}
+
+{% block content %}
+<div class="battle-container">
+    <div class="question-panel">
+        <h2>{{ battle.question.title }}</h2>
+        <div class="description">
+            {{ battle.question.description|linebreaks }}
+        </div>
+        <div class="test-cases">
+            <h3>Test Cases:</h3>
+            {% for test in battle.question.test_cases %}
+            <div class="test-case">
+                <p>Input: {{ test.input }}</p>
+                <p>Expected Output: {{ test.output }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="coding-panel">
+        <div class="editor-container">
+            <div class="editor-header">
+                <select id="language-select" class="language-select">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+                <button id="submit-code" class="submit-button">Submit Solution</button>
+            </div>
+            
+            <div class="editor-wrapper">
+                <textarea id="code-editor"></textarea>
+            </div>
+        </div>
+        
+        <div class="battle-status">
+            <div class="player player1 {% if battle.player1_completed %}completed{% endif %}">
+                <h3>{{ room.player1.username }}</h3>
+                <span class="status">{{ battle.player1_completed|yesno:"Completed,Coding..." }}</span>
+            </div>
+            <div class="player player2 {% if battle.player2_completed %}completed{% endif %}">
+                <h3>{{ room.player2.username }}</h3>
+                <span class="status">{{ battle.player2_completed|yesno:"Completed,Coding..." }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .battle-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 20px;
+        height: calc(100vh - 100px);
+    }
+    
+    .question-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow-y: auto;
+    }
+    
+    .coding-panel {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .battle-status {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    
+    .player {
+        padding: 10px;
+        border-radius: 4px;
+        background: #f8f9fa;
+        text-align: center;
+    }
+    
+    .player.completed {
+        background: #28a745;
+        color: white;
+    }
+    
+    .submit-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+    
+    .test-result {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+    }
+    
+    .test-result.passed {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .test-result.failed {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .error {
+        color: #721c24;
+        margin-top: 5px;
+    }
+</style>
+
+<script>
+    // ... (Previous CodeMirror initialization code) ...
+    
+    document.getElementById('submit-code').addEventListener('click', function() {
+        const code = editor.getValue();
+        const language = document.getElementById('language-select').value;
+        
+        fetch('{% url "mpcoding:submit_code" room.room_id %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `code=${encodeURIComponent(code)}&language=${encodeURIComponent(language)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                document.getElementById('submit-code').disabled = true;
+                document.getElementById('submit-code').textContent = 'Submitted';
+                
+                // Display test results
+                const resultsHtml = data.test_results.map(result => `
+                    <div class="test-result ${result.passed ? 'passed' : 'failed'}">
+                        <div>Input: ${result.input}</div>
+                        <div>Expected: ${result.expected}</div>
+                        <div>Actual: ${result.actual || 'Error'}</div>
+                        ${result.error ? `<div class="error">Error: ${result.error}</div>` : ''}
+                    </div>
+                `).join('');
+                
+                document.querySelector('.test-results').innerHTML = resultsHtml;
+            }
+        });
+    });
+    
+    // Poll for battle completion
+    setInterval(() => {
+        fetch('{% url "mpcoding:check_battle" room.room_id %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.completed) {
+                    window.location.href = "{% url 'mpcoding:battle_result' room.room_id %}";
+                }
+            });
+    }, 2000);
+</script>
+{% endblock %} 
