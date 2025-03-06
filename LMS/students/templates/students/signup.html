@@ -1,0 +1,23 @@
+{% extends "students/base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Sign Up</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </form>
+    
+    <div class="social-auth">
+        <a href="{% provider_login_url 'google' %}" class="google-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+            Sign up with Google
+        </a>
+    </div>
+    
+    <div class="auth-links">
+        <p>Already have an account? <a href="{% url 'students:login' %}">Login</a></p>
+    </div>
+</div>
+{% endblock %} 
