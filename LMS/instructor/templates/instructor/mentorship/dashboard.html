@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mentorship-dashboard">
+    <h2>Mentorship Dashboard</h2>
+    
+    <section class="upcoming-sessions">
+        <h3>Upcoming Sessions</h3>
+        {% if upcoming_sessions %}
+            <div class="sessions-list">
+                {% for session in upcoming_sessions %}
+                    <div class="session-card">
+                        <h4>Session with {{ session.student.username }}</h4>
+                        <p>Date: {{ session.slot.date }}</p>
+                        <p>Time: {{ session.slot.start_time }} - {{ session.slot.end_time }}</p>
+                        <p>Meet Link: <a href="{{ session.meet_link }}">Join Meeting</a></p>
+                        <a href="{% url 'instructor:session_detail' session.id %}" class="btn">View Details</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No upcoming sessions.</p>
+        {% endif %}
+    </section>
+
+    <section class="pending-requests">
+        <h3>Pending Requests</h3>
+        {% if pending_requests %}
+            <div class="requests-list">
+                {% for request in pending_requests %}
+                    <div class="request-card">
+                        <h4>Request from {{ request.student.username }}</h4>
+                        <p>Date: {{ request.slot.date }}</p>
+                        <p>Time: {{ request.slot.start_time }} - {{ request.slot.end_time }}</p>
+                        <a href="{% url 'instructor:session_detail' request.id %}" class="btn">Review Request</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No pending requests.</p>
+        {% endif %}
+    </section>
+
+    <div class="dashboard-actions">
+        <a href="{% url 'instructor:manage_slots' %}" class="btn">Manage Availability</a>
+        <a href="{% url 'instructor:manage_sessions' %}" class="btn">View All Sessions</a>
+    </div>
+</div>
+{% endblock %} 

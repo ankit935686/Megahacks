@@ -1,0 +1,28 @@
+{% extends "students/base.html" %}
+{% load socialaccount %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Sign Up</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </form>
+    
+    <div class="social-auth">
+        <a href="{% provider_login_url 'google' %}" class="google-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+            Sign up with Google
+        </a>
+        <a href="{% provider_login_url 'github' %}" class="github-btn">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo">
+            Sign up with GitHub
+        </a>
+    </div>
+    
+    <div class="auth-links">
+        <p>Already have an account? <a href="{% url 'instructor:login' %}">ADI DAB</a></p>
+    </div>
+</div>
+{% endblock %} 

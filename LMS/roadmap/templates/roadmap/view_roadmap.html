@@ -1,0 +1,325 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Career Roadmap{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom styling for roadmap */
+    .roadmap-container {
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .roadmap-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%232d3748' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+    
+    .timeline-path {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #3182ce, #63b3ed);
+        transform: translateX(-50%);
+        z-index: 1;
+    }
+    
+    .milestone {
+        position: relative;
+        margin-bottom: 3rem;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+    
+    .milestone:hover {
+        transform: translateY(-5px);
+    }
+    
+    .milestone::before {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #3182ce;
+        left: 50%;
+        top: 2rem;
+        transform: translateX(-50%);
+        box-shadow: 0 0 0 5px rgba(49, 130, 206, 0.3);
+        z-index: 2;
+    }
+    
+    .milestone-content {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        border-left: 4px solid #3182ce;
+        overflow: hidden;
+    }
+    
+    .milestone-content:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transform: translateY(-3px);
+    }
+    
+    .milestone-header {
+        background: linear-gradient(90deg, #3182ce, #4299e1);
+        color: white;
+        padding: 1rem 1.5rem;
+        font-weight: bold;
+        font-size: 1.25rem;
+        clip-path: polygon(0 0, 100% 0, 97% 100%, 0% 100%);
+    }
+    
+    .milestone-body {
+        padding: 1.5rem;
+    }
+    
+    .milestone-body ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .milestone-body li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+    }
+    
+    .milestone-body li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: #3182ce;
+        font-weight: bold;
+    }
+    
+    .suggestions-card {
+        background: linear-gradient(135deg, #4c51bf 0%, #6b46c1 100%);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        position: relative;
+    }
+    
+    .suggestions-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.8;
+    }
+    
+    .suggestions-header {
+        padding: 1.5rem;
+        color: white;
+        font-weight: bold;
+        font-size: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .suggestions-body {
+        padding: 1.5rem;
+        color: white;
+    }
+    
+    .suggestions-body ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .suggestions-body li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    
+    .suggestions-body li::before {
+        content: "★";
+        position: absolute;
+        left: 0;
+        color: #f6e05e;
+    }
+    
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+    }
+    
+    .action-button svg {
+        margin-right: 0.5rem;
+    }
+    
+    .print-button {
+        background: linear-gradient(90deg, #3182ce, #4299e1);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(49, 130, 206, 0.4), 0 2px 4px -1px rgba(49, 130, 206, 0.06);
+    }
+    
+    .print-button:hover {
+        box-shadow: 0 10px 15px -3px rgba(49, 130, 206, 0.4), 0 4px 6px -2px rgba(49, 130, 206, 0.05);
+    }
+    
+    .upload-button {
+        background: linear-gradient(90deg, #4a5568, #718096);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(74, 85, 104, 0.4), 0 2px 4px -1px rgba(74, 85, 104, 0.06);
+    }
+    
+    .upload-button:hover {
+        box-shadow: 0 10px 15px -3px rgba(74, 85, 104, 0.4), 0 4px 6px -2px rgba(74, 85, 104, 0.05);
+    }
+    
+    @media print {
+        .no-print {
+            display: none;
+        }
+        
+        .roadmap-container {
+            background: white !important;
+        }
+        
+        .roadmap-container::before {
+            display: none;
+        }
+        
+        .milestone-content {
+            box-shadow: none;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .suggestions-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: black;
+        }
+        
+        .suggestions-header, .suggestions-body {
+            color: black;
+        }
+        
+        .suggestions-body li::before {
+            color: #4a5568;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen roadmap-container py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-5xl mx-auto relative">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-white mb-4">Your Career Roadmap</h1>
+                <p class="text-blue-200 text-xl">Generated on {{ roadmap.generated_at|date:"F j, Y" }}</p>
+                <div class="mt-6 inline-block bg-blue-900 bg-opacity-50 px-4 py-2 rounded-full text-blue-200">
+                    <span class="animate-pulse inline-block w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
+                    Personalized based on your resume
+                </div>
+            </div>
+            
+            <!-- Timeline Path -->
+            <div class="timeline-path"></div>
+            
+            <!-- Display roadmap content -->
+            <div class="space-y-12">
+                <div class="milestone">
+                    <div class="milestone-content">
+                        <div class="milestone-header">
+                            CAREER PROGRESSION PATH
+                        </div>
+                        <div class="milestone-body">
+                            {{ roadmap.roadmap_content|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Suggestions Card -->
+                <div class="suggestions-card mt-16">
+                    <div class="suggestions-header">
+                        <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Additional Suggestions
+                    </div>
+                    <div class="suggestions-body">
+                        {{ roadmap.suggestions|linebreaks }}
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex justify-between items-center pt-8 no-print">
+                    <a href="{% url 'roadmap:upload_resume' %}" class="action-button upload-button">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Upload New Resume
+                    </a>
+                    <button onclick="window.print()" class="action-button print-button">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Print Roadmap
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Animation for milestones on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const milestones = document.querySelectorAll('.milestone');
+        
+        function checkScroll() {
+            milestones.forEach((milestone, index) => {
+                const rect = milestone.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.8) {
+                    setTimeout(() => {
+                        milestone.style.opacity = '1';
+                        milestone.style.transform = 'translateY(0)';
+                    }, index * 150);
+                }
+            });
+        }
+        
+        // Set initial state
+        milestones.forEach(milestone => {
+            milestone.style.opacity = '0';
+            milestone.style.transform = 'translateY(20px)';
+            milestone.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+        
+        // Check on load and scroll
+        checkScroll();
+        window.addEventListener('scroll', checkScroll);
+    });
+</script>
+{% endblock %} 
