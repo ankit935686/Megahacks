@@ -19,20 +19,41 @@ from django.urls import reverse
 
 @login_required
 def home(request):
-    if not request.user.is_authenticated:
-        return redirect('instructor:login')
-    
-    # Only check for profile if user is authenticated
     if not hasattr(request.user, 'instructorprofile'):
         return redirect('instructor:create_profile')
-    return render(request, 'home.html')
+    
+    # Get upcoming sessions and pending requests for the dashboard
+    upcoming_sessions = MentorshipSession.objects.filter(
+        instructor=request.user,
+        status='APPROVED',
+        slot__date__gte=datetime.now().date()
+    ).order_by('slot__date', 'slot__start_time')
+    
+    pending_requests = MentorshipSession.objects.filter(
+        instructor=request.user,
+        status='PENDING'
+    ).order_by('slot__date')
+    
+    context = {
+        'upcoming_sessions': upcoming_sessions,
+        'pending_requests': pending_requests,
+    }
+    return render(request, 'instructor/home.html', context)
     
 
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('instructor:home')
-    return render(request, 'login.html')
+        try:
+            # Check if instructor profile exists
+            profile = request.user.instructorprofile
+            return redirect('instructor:home')
+        except InstructorProfile.DoesNotExist:
+            # If no profile exists, redirect to profile creation
+            return redirect('instructor:create_profile')
+    
+    # Add next parameter to indicate instructor path
+    return redirect(reverse('account_login') + '?next=/instructor/')
 
 def signup_view(request):
     if request.user.is_authenticated:
@@ -43,7 +64,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('instructor:home')
+            return redirect('instructor:create_profile')
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
@@ -122,7 +143,6 @@ def session_detail(request, session_id):
 
 @login_required
 def create_profile(request):
-    # Check if profile already exists
     try:
         profile = request.user.instructorprofile
         return redirect('instructor:home')
@@ -133,6 +153,7 @@ def create_profile(request):
                 profile = form.save(commit=False)
                 profile.user = request.user
                 profile.save()
+                form.save_m2m()
                 messages.success(request, 'Profile created successfully!')
                 return redirect('instructor:home')
         else:
