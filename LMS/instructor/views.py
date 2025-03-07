@@ -157,10 +157,11 @@ def edit_profile(request):
 
 @login_required
 def student_list(request):
-    # Get all students (assuming they have a profile with role='student')
+    # Get all students with completed profiles
     students = User.objects.filter(
-        studentprofile__isnull=False  # Adjust this based on your student app's model
-    ).exclude(id=request.user.id)
+        studentprofile__isnull=False,
+        studentprofile__is_profile_completed=True
+    ).exclude(id=request.user.id).select_related('studentprofile')
     
     # Get friend request status for each student
     for student in students:

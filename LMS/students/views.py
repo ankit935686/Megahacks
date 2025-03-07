@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from .forms import StudentProfileForm
 from .models import StudentProfile
 from django.contrib import messages
+from instructor.models import FriendRequest
 
 # Create your views here.
 
@@ -74,11 +75,52 @@ def home(request):
         if not profile.is_profile_completed:
             messages.info(request, 'Please complete your profile to continue.')
             return redirect('students:profile_form')
+            
+        # Add this to get pending requests count
+        pending_requests_count = FriendRequest.objects.filter(
+            student=request.user,
+            status='PENDING'
+        ).count()
+        
+        return render(request, 'students/home.html', {
+            'pending_requests_count': pending_requests_count
+        })
     except StudentProfile.DoesNotExist:
         messages.info(request, 'Please complete your profile to continue.')
         return redirect('students:profile_form')
+
+@login_required
+def mentor_requests(request):
+    # Get all friend requests for this student
+    friend_requests = FriendRequest.objects.filter(
+        student=request.user,
+        status='PENDING'
+    ).select_related('instructor')
     
-    return render(request, 'students/home.html')
+    return render(request, 'students/mentor_requests.html', {
+        'friend_requests': friend_requests
+    })
+
+@login_required
+def handle_request(request, request_id):
+    if request.method == 'POST':
+        friend_request = get_object_or_404(
+            FriendRequest, 
+            id=request_id, 
+            student=request.user,
+            status='PENDING'
+        )
+        
+        action = request.POST.get('action')
+        if action == 'accept':
+            friend_request.status = 'ACCEPTED'
+            messages.success(request, f'You are now connected with {friend_request.instructor.username}')
+        elif action == 'reject':
+            friend_request.status = 'REJECTED'
+            messages.info(request, 'Request rejected')
+            
+        friend_request.save()
+        return redirect('students:mentor_requests')
 
 
 

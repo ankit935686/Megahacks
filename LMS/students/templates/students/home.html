@@ -24,6 +24,15 @@
                 <p>This is a placeholder for your course content.</p>
             </div>
         </div>
+        <div class="mentor-section">
+            <h3>Mentorship</h3>
+            <a href="{% url 'students:mentor_requests' %}" class="btn btn-primary">
+                View Mentor Requests
+                {% if pending_requests_count %}
+                    <span class="badge">{{ pending_requests_count }}</span>
+                {% endif %}
+            </a>
+        </div>
     </div>
     {% endif %}
     <a href="{% url 'instructor:home' %}">Instructor Dashboard</a>
