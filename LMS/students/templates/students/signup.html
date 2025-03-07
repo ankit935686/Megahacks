@@ -2,27 +2,208 @@
 {% load socialaccount %}
 
 {% block content %}
-<div class="auth-container">
-    <h2>Sign Up</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Sign Up</button>
-    </form>
+<style>
+    .signup-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #ECF4FF;
+        background-image: linear-gradient(135deg, #ECF4FF 0%, #2D496F 100%);
+        padding: 20px;
+    }
     
-    <div class="social-auth">
-        <a href="{% provider_login_url 'google' %}" class="google-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
-            Sign up with Google
-        </a>
-        <a href="{% provider_login_url 'github' %}" class="github-btn">
-            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo">
-            Sign up with GitHub
-        </a>
-    </div>
+    .signup-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(46, 103, 172, 0.2);
+        padding: 40px;
+        max-width: 420px;
+        width: 100%;
+    }
     
-    <div class="auth-links">
-        <p>Already have an account? <a href="{% url 'students:login' %}">Login</a></p>
+    .signup-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: #2E67AC;
+        text-align: center;
+    }
+    
+    .signup-form {
+        text-align: left;
+        margin-bottom: 20px;
+    }
+    
+    .signup-form p {
+        margin-bottom: 15px;
+    }
+    
+    .signup-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #2D496F;
+    }
+    
+    .signup-form input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ECF4FF;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(45, 73, 111, 0.1);
+        box-sizing: border-box;
+    }
+    
+    .signup-form input:focus {
+        border-color: #2E67AC;
+        box-shadow: 0 2px 8px rgba(46, 103, 172, 0.2);
+    }
+    
+    .signup-form ul.errorlist {
+        color: #e74c3c;
+        font-size: 13px;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .submit-button {
+        background-color: #2E67AC;
+        color: #fff;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(46, 103, 172, 0.3);
+        margin-top: 15px;
+    }
+    
+    .submit-button:hover {
+        background-color: #265996;
+    }
+    
+    .social-signup {
+        margin-top: 30px;
+        text-align: center;
+    }
+    
+    .divider {
+        font-size: 15px;
+        color: #2D496F;
+        margin-bottom: 15px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .divider span {
+        background-color: #fff;
+        padding: 0 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .divider:after {
+        content: '';
+        position: absolute;
+        height: 1px;
+        width: 100%;
+        background-color: #ECF4FF;
+        top: 50%;
+        left: 0;
+    }
+    
+    .social-buttons {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .social-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #2D496F;
+        transition: all 0.3s ease;
+        background-color: #ECF4FF;
+        border: 1px solid #ECF4FF;
+        box-shadow: 0 2px 5px rgba(45, 73, 111, 0.1);
+    }
+    
+    .social-btn:hover {
+        background-color: #dbe9ff;
+    }
+    
+    .social-logo {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+    }
+    
+    .auth-links {
+        margin-top: 25px;
+        font-size: 15px;
+        text-align: center;
+    }
+    
+    .auth-link {
+        color: #FEAD54;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .auth-link:hover {
+        color: #e89438;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="signup-container">
+    <div class="signup-card">
+        <h2 class="signup-title">Sign Up</h2>
+        
+        <!-- Signup Form -->
+        <form method="post" class="signup-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="submit-button">Sign Up</button>
+        </form>
+        
+        <!-- Social Auth Buttons -->
+        <div class="social-signup">
+            <p class="divider"><span>Or sign up with</span></p>
+            <div class="social-buttons">
+                <a href="{% provider_login_url 'google' %}" class="social-btn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo" class="social-logo">
+                    Google
+                </a>
+                <a href="{% provider_login_url 'github' %}" class="social-btn">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" class="social-logo">
+                    GitHub
+                </a>
+            </div>
+        </div>
+        
+        <!-- Auth Links -->
+        <div class="auth-links">
+            <p>Already have an account? <a href="{% url 'students:login' %}" class="auth-link">Login</a></p>
+        </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

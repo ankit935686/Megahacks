@@ -2,38 +2,188 @@
 {% load socialaccount %}
 
 {% block content %}
-<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f5f5f5; padding: 20px;">
-    <div style="background: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 30px; max-width: 400px; width: 100%; text-align: center;">
-        <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: #333;">Login</h2>
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #ECF4FF;
+        background-image: linear-gradient(135deg, #ECF4FF 0%, #2D496F 100%);
+        padding: 20px;
+    }
+    
+    .login-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(46, 103, 172, 0.2);
+        padding: 40px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .login-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: #2E67AC;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #ECF4FF;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(45, 73, 111, 0.1);
+        box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+        border-color: #2E67AC;
+        box-shadow: 0 2px 8px rgba(46, 103, 172, 0.2);
+    }
+    
+    .submit-button {
+        background-color: #2E67AC;
+        color: #fff;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(46, 103, 172, 0.3);
+    }
+    
+    .submit-button:hover {
+        background-color: #265996;
+    }
+    
+    .social-login {
+        margin-top: 30px;
+    }
+    
+    .divider {
+        font-size: 15px;
+        color: #2D496F;
+        margin-bottom: 15px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .divider span {
+        background-color: #fff;
+        padding: 0 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .divider:after {
+        content: '';
+        position: absolute;
+        height: 1px;
+        width: 100%;
+        background-color: #ECF4FF;
+        top: 50%;
+        left: 0;
+    }
+    
+    .social-buttons {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .social-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #2D496F;
+        transition: all 0.3s ease;
+        background-color: #ECF4FF;
+        border: 1px solid #ECF4FF;
+        box-shadow: 0 2px 5px rgba(45, 73, 111, 0.1);
+    }
+    
+    .social-btn:hover {
+        background-color: #dbe9ff;
+    }
+    
+    .social-logo {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+    }
+    
+    .auth-links {
+        margin-top: 25px;
+        font-size: 15px;
+    }
+    
+    .auth-link {
+        color: #FEAD54;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .auth-link:hover {
+        color: #e89438;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <h2 class="login-title">Login</h2>
         
         <!-- Login Form -->
         <form method="post" action="{% url 'account_login' %}">
             {% csrf_token %}
-            <div style="margin-bottom: 15px;">
-                <input type="text" name="login" placeholder="Username or Email" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; outline: none; transition: border-color 0.3s ease;" required>
+            <div class="form-group">
+                <input type="text" name="login" placeholder="Username or Email" class="form-input" required>
             </div>
-            <div style="margin-bottom: 15px;">
-                <input type="password" name="password" placeholder="Password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; outline: none; transition: border-color 0.3s ease;" required>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" class="form-input" required>
             </div>
-            <button type="submit" style="background-color: #007bff; color: #fff; border: none; padding: 10px; border-radius: 5px; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease; width: 100%;">Login</button>
+            <button type="submit" class="submit-button">Login</button>
         </form>
         
         <!-- Social Auth Buttons -->
-        <div style="margin-top: 20px;">
-            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Or sign in with:</p>
-            <a href="{% provider_login_url 'google' %}" class="social-btn google-btn">
-                <img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color_64dp.png" alt="Google Logo" class="social-logo">
-                Sign in with Google
-            </a>
-            <a href="{% provider_login_url 'github' %}" style="display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 5px; font-size: 14px; text-decoration: none; color: #fff; margin-bottom: 10px; transition: opacity 0.3s ease; background-color: #333;">
-                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" style="width: 20px; height: 20px; margin-right: 10px;">
-                Sign in with GitHub
-            </a>
+        <div class="social-login">
+            <p class="divider"><span>Or sign in with</span></p>
+            <div class="social-buttons">
+                <a href="{% provider_login_url 'google' %}" class="social-btn">
+                    <img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color_64dp.png" alt="Google Logo" class="social-logo">
+                    Google
+                </a>
+                <a href="{% provider_login_url 'github' %}" class="social-btn">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" class="social-logo">
+                    GitHub
+                </a>
+            </div>
         </div>
         
         <!-- Auth Links -->
-        <div style="margin-top: 15px; font-size: 14px;">
-            <p>Don't have an account? <a href="{% url 'students:signup' %}" style="color: #007bff; text-decoration: none; transition: color 0.3s ease;">Sign Up</a></p>
+        <div class="auth-links">
+            <p>Don't have an account? <a href="{% url 'students:signup' %}" class="auth-link">Sign Up</a></p>
         </div>
     </div>
 </div>

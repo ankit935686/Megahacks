@@ -87,7 +87,7 @@
         }
         
         .github-btn {
-            background-color: #24292e;
+            background-color:rgb(10, 72, 134);
             color: white;
         }
         
@@ -99,10 +99,142 @@
             text-align: center;
             margin-top: 20px;
         }
+        
+        /* Navigation and Sidebar Styles */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color:rgb(102, 125, 226);
+            padding-top: 60px;
+            color: white;
+            z-index: 40;
+        }
+
+        .sidebar-link {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            color: #ffffff;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-link:hover {
+            background-color:rgb(59, 181, 229);
+        }
+
+        .sidebar-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            height: 60px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 30;
+        }
+
+        .content-wrapper {
+            margin-top: 60px;
+            padding: 20px;
+        }
+
+        .notification-badge {
+            background-color: #ef4444;
+            color: white;
+            border-radius: 9999px;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
     </style>
 </head>
-<body>
-    {% block content %}{% endblock %}
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="mb-8 px-6">
+            <h2 class="text-xl font-bold">Student Dashboard</h2>
+        </div>
+        <nav>
+            <a href="{% url 'students:home' %}" class="sidebar-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fas fa-book"></i> My Courses
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fas fa-calendar"></i> Schedule
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fas fa-tasks"></i> Assignments
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fas fa-chart-line"></i> Progress
+            </a>
+            <a href="{% url 'students:mentor_requests' %}" class="sidebar-link">
+                <i class="fas fa-user-friends"></i> Mentor Requests
+                {% if pending_requests_count > 0 %}
+                    <span class="notification-badge">{{ pending_requests_count }}</span>
+                {% endif %}
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="flex items-center">
+                <input type="text" placeholder="Search..." class="px-4 py-2 rounded-lg border border-gray-300">
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 hover:bg-gray-100 rounded-full relative">
+                    <i class="fas fa-bell"></i>
+                    {% if pending_requests_count > 0 %}
+                        <span class="notification-badge">{{ pending_requests_count }}</span>
+                    {% endif %}
+                </button>
+                <div class="flex items-center gap-2">
+                    {% if user.studentprofile.profile_picture %}
+                        <img src="{{ user.studentprofile.profile_picture.url }}" alt="Profile" class="w-8 h-8 rounded-full">
+                    {% else %}
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600"></i>
+                        </div>
+                    {% endif %}
+                    <span class="font-medium">{{ user.studentprofile.full_name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html> 
