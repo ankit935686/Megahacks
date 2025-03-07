@@ -4,6 +4,12 @@
 <div class="mentorship-dashboard">
     <h2>Mentorship Dashboard</h2>
     
+    <div class="dashboard-nav">
+        <a href="{% url 'instructor:student_list' %}" class="nav-btn">Browse Students</a>
+        <a href="{% url 'instructor:my_students' %}" class="nav-btn">My Students</a>
+        <a href="{% url 'instructor:manage_slots' %}" class="nav-btn">Manage Availability</a>
+    </div>
+
     <section class="upcoming-sessions">
         <h3>Upcoming Sessions</h3>
         {% if upcoming_sessions %}
@@ -46,4 +52,25 @@
         <a href="{% url 'instructor:manage_sessions' %}" class="btn">View All Sessions</a>
     </div>
 </div>
+
+<style>
+.dashboard-nav {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.nav-btn {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.nav-btn:hover {
+    background: #0056b3;
+}
+</style>
 {% endblock %} 

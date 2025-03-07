@@ -197,3 +197,6 @@ LOGGING = {
         },
     },
 }
+
+LOGIN_URL = 'instructor:login'
+LOGIN_REDIRECT_URL = 'instructor:home'
