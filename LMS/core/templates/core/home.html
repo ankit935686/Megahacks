@@ -203,9 +203,10 @@
           <a href="#how-it-works" class="nav-link text-secondary hover:text-primary font-medium transition-colors duration-200">How It Works</a>
           <a href="#features" class="nav-link text-secondary hover:text-primary font-medium transition-colors duration-200">Why Choose Us</a>
           <div class="ml-4 flex items-center space-x-4">
-            <a href="{% url 'students:login' %}" class="bg-gradient-to-r from-accent to-[#FF9B2F] text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-200 font-medium">
-              Sign Up
-            </a>
+            <a href="{% url 'core:login_options' %}" class="text-secondary hover:text-primary font-medium transition-colors duration-200">Log in</a>
+            <button class="bg-gradient-to-r from-accent to-[#FF9B2F] text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-200 font-medium">
+              Sign Up Free
+            </button>
           </div>
         </div>
         <div class="md:hidden flex items-center">
@@ -227,7 +228,10 @@
         <a href="#how-it-works" class="block px-4 py-2 text-secondary hover:text-primary hover:bg-light rounded-lg transition-colors duration-200 font-medium">How It Works</a>
         <a href="#features" class="block px-4 py-2 text-secondary hover:text-primary hover:bg-light rounded-lg transition-colors duration-200 font-medium">Why Choose Us</a>
         <div class="pt-2 space-y-3">
-          <a href="{% url 'students:login' %}" class="block px-4 py-2 bg-gradient-to-r from-accent to-[#FF9B2F] text-white rounded-lg transition-colors duration-200 font-medium text-center">Sign Up</a>
+          <a href="{% url 'core:login_options' %}" class="block px-4 py-2 text-secondary hover:text-primary hover:bg-light rounded-lg transition-colors duration-200 font-medium">Log in</a>
+          <button class="w-full bg-gradient-to-r from-accent to-[#FF9B2F] text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-medium">
+            Sign Up Free
+          </button>
         </div>
       </div>
     </div>

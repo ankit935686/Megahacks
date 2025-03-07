@@ -1,0 +1,49 @@
+{% extends 'students/base.html' %}
+
+{% block content %}
+<div class="wait-container">
+    <h2>Waiting Room</h2>
+    <p>Share this code with your opponent: <strong>{{ room.room_id }}</strong></p>
+    <div class="waiting-animation">
+        <div class="spinner"></div>
+        <p>Waiting for opponent to join...</p>
+    </div>
+</div>
+
+<style>
+    .wait-container {
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // Poll for opponent joining
+    setInterval(() => {
+        fetch('{% url "mpcoding:check_room" room.room_id %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.started) {
+                    window.location.href = "{% url 'mpcoding:battle_room' room.room_id %}";
+                }
+            });
+    }, 2000);
+</script>
+{% endblock %} 

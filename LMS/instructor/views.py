@@ -3,9 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
-from .models import MentorshipSlot, MentorshipSession, InstructorProfile
+from .models import MentorshipSlot, MentorshipSession, InstructorProfile, FriendRequest
 from datetime import datetime, timedelta
-from .forms import InstructorProfileForm 
+from .forms import InstructorProfileForm
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.urls import reverse
 
 
 
@@ -16,18 +19,25 @@ from .forms import InstructorProfileForm
 
 @login_required
 def home(request):
-    # Check if user has a profile
-    try:
-        profile = request.user.instructorprofile
-        return render(request, 'home.html')
-    except InstructorProfile.DoesNotExist:
+    if not request.user.is_authenticated:
+        return redirect('instructor:login')
+    
+    # Only check for profile if user is authenticated
+    if not hasattr(request.user, 'instructorprofile'):
         return redirect('instructor:create_profile')
+    return render(request, 'home.html')
+    
 
 
 def login_view(request):
-    return render(request, 'instructor/login.html')
+    if request.user.is_authenticated:
+        return redirect('instructor:home')
+    return render(request, 'login.html')
 
 def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect('instructor:home')
+        
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -36,7 +46,7 @@ def signup_view(request):
             return redirect('instructor:home')
     else:
         form = UserCreationForm()
-    return render(request, 'instructor/signup.html', {'form': form})
+    return render(request, 'signup.html', {'form': form})
 
 @login_required
 def mentorship_dashboard(request):
@@ -144,5 +154,49 @@ def edit_profile(request):
         form = InstructorProfileForm(instance=profile)
     
     return render(request, 'instructor/edit_profile.html', {'form': form})
+
+@login_required
+def student_list(request):
+    # Get all students with completed profiles
+    students = User.objects.filter(
+        studentprofile__isnull=False,
+        studentprofile__is_profile_completed=True
+    ).exclude(id=request.user.id).select_related('studentprofile')
+    
+    # Get friend request status for each student
+    for student in students:
+        friend_request = FriendRequest.objects.filter(
+            instructor=request.user,
+            student=student
+        ).first()
+        student.friend_request_status = friend_request.status if friend_request else None
+    
+    return render(request, 'instructor/mentorship/student_list.html', {
+        'students': students
+    })
+
+@login_required
+def send_friend_request(request, student_id):
+    if request.method == 'POST':
+        student = get_object_or_404(User, id=student_id)
+        FriendRequest.objects.get_or_create(
+            instructor=request.user,
+            student=student,
+            defaults={'status': 'PENDING'}
+        )
+        messages.success(request, f'Friend request sent to {student.username}')
+    return redirect('instructor:student_list')
+
+@login_required
+def my_students(request):
+    # Get all accepted friend requests
+    accepted_requests = FriendRequest.objects.filter(
+        instructor=request.user,
+        status='ACCEPTED'
+    )
+    students = [req.student for req in accepted_requests]
+    return render(request, 'instructor/mentorship/my_students.html', {
+        'students': students
+    })
 
 

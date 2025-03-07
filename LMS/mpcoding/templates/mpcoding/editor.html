@@ -1,0 +1,239 @@
+{% extends 'students/base.html' %}
+{% load static %}
+
+{% block title %}Code Editor{% endblock %}
+
+{% block extra_head %}
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+
+<!-- CodeMirror JS and its dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<!-- Add these new dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+    <div class="editor-header">
+        <select id="language-select" class="language-select">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+        </select>
+        <button id="run-code" class="run-button">Run Code</button>
+    </div>
+    
+    <div class="editor-wrapper">
+        <textarea id="code-editor"></textarea>
+    </div>
+    
+    <div class="output-container">
+        <div class="output-header">
+            <h3>Output</h3>
+            <span id="execution-time"></span>
+        </div>
+        <pre id="output" class="output"></pre>
+        <pre id="error" class="error"></pre>
+    </div>
+</div>
+
+<style>
+    .editor-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .editor-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .language-select {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    .run-button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .run-button:hover {
+        background-color: #218838;
+    }
+
+    .editor-wrapper {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .CodeMirror {
+        height: 400px;
+        font-size: 14px;
+    }
+
+    .output-container {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    .output-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .output {
+        color: #28a745;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+    
+    .error {
+        color: #dc3545;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+    
+    #execution-time {
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CodeMirror
+        var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+            mode: 'python',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false,
+            lineWrapping: true,
+        });
+
+        // Add starter code templates
+        const starterCode = {
+            'python': `# Python Example
+print("Hello, World!")
+for i in range(5):
+    print(f"Number: {i}")`,
+            
+            'javascript': `// JavaScript Example
+console.log("Hello, World!");
+for (let i = 0; i < 5; i++) {
+    console.log(\`Number: \${i}\`);
+}`,
+            
+            'java': `// Java Example
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+        for (int i = 0; i < 5; i++) {
+            System.out.println("Number: " + i);
+        }
+    }
+}`,
+            
+            'cpp': `// C++ Example
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, World!" << endl;
+    for (int i = 0; i < 5; i++) {
+        cout << "Number: " << i << endl;
+    }
+    return 0;
+}`
+        };
+
+        // Update code when language changes
+        document.getElementById('language-select').addEventListener('change', function(e) {
+            const language = e.target.value;
+            const modeMap = {
+                'python': 'python',
+                'javascript': 'javascript',
+                'java': 'text/x-java',
+                'cpp': 'text/x-c++src'
+            };
+            editor.setOption('mode', modeMap[language]);
+            editor.setValue(starterCode[language] || '');
+        });
+
+        // Set initial code
+        editor.setValue(starterCode['python']);
+
+        // Updated Run code handler
+        document.getElementById('run-code').addEventListener('click', function() {
+            const code = editor.getValue();
+            const language = document.getElementById('language-select').value;
+            
+            // Clear previous output
+            document.getElementById('output').textContent = 'Running...';
+            document.getElementById('error').textContent = '';
+            document.getElementById('execution-time').textContent = '';
+
+            // Send code to backend
+            fetch('{% url "mpcoding:editor" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `code=${encodeURIComponent(code)}&language=${encodeURIComponent(language)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('output').textContent = data.output || '';
+                    document.getElementById('error').textContent = data.error || '';
+                    document.getElementById('execution-time').textContent = 
+                        `Execution time: ${(data.execution_time * 1000).toFixed(2)}ms`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('error').textContent = 'Error: ' + error;
+            });
+        });
+
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %} 
