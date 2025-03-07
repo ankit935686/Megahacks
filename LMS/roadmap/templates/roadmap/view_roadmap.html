@@ -6,9 +6,10 @@
 <style>
     /* Custom styling for roadmap */
     .roadmap-container {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        background: #1a202c;  /* Dark background */
         position: relative;
         overflow: hidden;
+        min-height: 100vh;
     }
     
     .roadmap-container::before {
@@ -23,14 +24,7 @@
     }
     
     .timeline-path {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: linear-gradient(to bottom, #3182ce, #63b3ed);
-        transform: translateX(-50%);
-        z-index: 1;
+        display: none;  /* This removes the vertical line */
     }
     
     .milestone {
@@ -61,9 +55,8 @@
     .milestone-content {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 0.75rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
-        border-left: 4px solid #3182ce;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
         overflow: hidden;
     }
     
@@ -73,16 +66,28 @@
     }
     
     .milestone-header {
-        background: linear-gradient(90deg, #3182ce, #4299e1);
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
         color: white;
-        padding: 1rem 1.5rem;
-        font-weight: bold;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
         font-size: 1.25rem;
-        clip-path: polygon(0 0, 100% 0, 97% 100%, 0% 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .milestone-header::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 40px;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 100%);
     }
     
     .milestone-body {
-        padding: 1.5rem;
+        padding: 2rem;
+        color: #1a202c;
     }
     
     .milestone-body ul {
@@ -93,24 +98,31 @@
     .milestone-body li {
         position: relative;
         padding-left: 1.5rem;
-        margin-bottom: 0.75rem;
-        line-height: 1.5;
+        margin-bottom: 1rem;
+        line-height: 1.6;
     }
     
     .milestone-body li::before {
-        content: "→";
+        content: "•";
         position: absolute;
         left: 0;
-        color: #3182ce;
+        color: #2563eb;
         font-weight: bold;
+    }
+    
+    .milestone-body h3 {
+        color: #2563eb;
+        margin-bottom: 1rem;
+        font-weight: 600;
     }
     
     .suggestions-card {
         background: linear-gradient(135deg, #4c51bf 0%, #6b46c1 100%);
-        border-radius: 0.75rem;
+        border-radius: 1rem;
         overflow: hidden;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
     }
     
     .suggestions-card::before {
@@ -125,16 +137,22 @@
     }
     
     .suggestions-header {
+        background: rgba(0,0,0,0.2);
         padding: 1.5rem;
         color: white;
-        font-weight: bold;
+        font-weight: 600;
         font-size: 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
     
     .suggestions-body {
-        padding: 1.5rem;
-        color: white;
+        padding: 1.75rem;
+        color: rgba(255,255,255,0.9);
+        font-size: 1.1rem;
+        line-height: 1.7;
     }
     
     .suggestions-body ul {
@@ -143,32 +161,42 @@
     }
     
     .suggestions-body li {
-        position: relative;
-        padding-left: 1.5rem;
+        background: rgba(0,0,0,0.1);
+        padding: 1rem 1.5rem 1rem 2.5rem;
+        border-radius: 0.5rem;
         margin-bottom: 1rem;
-        line-height: 1.5;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
     }
     
     .suggestions-body li::before {
-        content: "★";
+        content: "";
         position: absolute;
         left: 0;
-        color: #f6e05e;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23f6e05e' viewBox='0 0 24 24'%3E%3Cpath d='M9.153 5.408C10.42 3.136 11.053 2 12 2c.947 0 1.58 1.136 2.847 3.408l.328.588c.36.646.54.969.82 1.182c.28.213.63.292 1.33.45l.636.144c2.46.557 3.689.835 3.982 1.776c.292.94-.546 1.921-2.223 3.882l-.434.507c-.476.557-.715.836-.822 1.18c-.107.345-.071.717.001 1.46l.066.677c.253 2.617.38 3.925-.386 4.506c-.766.582-1.918.051-4.22-1.009l-.597-.274c-.654-.302-.981-.452-1.328-.452c-.347 0-.674.15-1.329.452l-.595.274c-2.303 1.06-3.455 1.59-4.22 1.01c-.767-.582-.64-1.89-.387-4.507l.066-.676c.072-.744.108-1.116 0-1.46c-.106-.345-.345-.624-.821-1.18l-.434-.508c-1.677-1.96-2.515-2.941-2.223-3.882c.293-.941 1.523-1.22 3.983-1.776l.636-.144c.699-.158 1.048-.237 1.329-.45c.28-.213.46-.536.82-1.182l.328-.588Z'/%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
     }
     
     .action-button {
         display: inline-flex;
         align-items: center;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: bold;
+        padding: 0.875rem 1.75rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        font-size: 0.875rem;
     }
     
     .action-button:hover {
         transform: translateY(-2px);
+        box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.2);
     }
     
     .action-button svg {
@@ -176,23 +204,15 @@
     }
     
     .print-button {
-        background: linear-gradient(90deg, #3182ce, #4299e1);
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
         color: white;
-        box-shadow: 0 4px 6px -1px rgba(49, 130, 206, 0.4), 0 2px 4px -1px rgba(49, 130, 206, 0.06);
-    }
-    
-    .print-button:hover {
-        box-shadow: 0 10px 15px -3px rgba(49, 130, 206, 0.4), 0 4px 6px -2px rgba(49, 130, 206, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
     }
     
     .upload-button {
-        background: linear-gradient(90deg, #4a5568, #718096);
+        background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
         color: white;
-        box-shadow: 0 4px 6px -1px rgba(74, 85, 104, 0.4), 0 2px 4px -1px rgba(74, 85, 104, 0.06);
-    }
-    
-    .upload-button:hover {
-        box-shadow: 0 10px 15px -3px rgba(74, 85, 104, 0.4), 0 4px 6px -2px rgba(74, 85, 104, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(75, 85, 99, 0.4);
     }
     
     @media print {
@@ -227,99 +247,112 @@
             color: #4a5568;
         }
     }
+
+    /* Add responsive padding */
+    @media (max-width: 768px) {
+        .roadmap-container {
+            padding: 1rem;
+        }
+
+        .milestone-body {
+            padding: 1.5rem;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen roadmap-container py-12">
-    <div class="container mx-auto px-4">
-        <div class="max-w-5xl mx-auto relative">
-            <!-- Header -->
-            <div class="text-center mb-12">
-                <h1 class="text-5xl font-bold text-white mb-4">Your Career Roadmap</h1>
-                <p class="text-blue-200 text-xl">Generated on {{ roadmap.generated_at|date:"F j, Y" }}</p>
-                <div class="mt-6 inline-block bg-blue-900 bg-opacity-50 px-4 py-2 rounded-full text-blue-200">
-                    <span class="animate-pulse inline-block w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
-                    Personalized based on your resume
-                </div>
+<div class="roadmap-container p-6 min-h-screen">
+    <!-- Header with better contrast -->
+    <div class="text-center mb-12 bg-gradient-to-r from-blue-600 to-blue-800 py-16 rounded-lg shadow-lg">
+        <h1 class="text-4xl font-bold text-white mb-3">Career Development Roadmap</h1>
+        <p class="text-xl text-blue-100">Harsh Dalvi</p>
+    </div>
+
+    <!-- Career Progression Path -->
+    <div class="milestone">
+        <div class="milestone-content">
+            <div class="milestone-header">
+                1. CAREER PROGRESSION PATH
             </div>
-            
-            <!-- Timeline Path -->
-            <div class="timeline-path"></div>
-            
-            <!-- Display roadmap content -->
-            <div class="space-y-12">
-                <div class="milestone">
-                    <div class="milestone-content">
-                        <div class="milestone-header">
-                            CAREER PROGRESSION PATH
-                        </div>
-                        <div class="milestone-body">
-                            {{ roadmap.roadmap_content|linebreaks }}
-                        </div>
-                    </div>
+            <div class="milestone-body">
+                <!-- Short-term goals -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-3">Short-term goals (next 1-2 years)</h3>
+                    <ul>
+                        <li>Secure a full-time internship in backend development at a reputable company.</li>
+                        <li>Gain practical experience with a variety of backend technologies (e.g., expand beyond Django, explore Node.js or other frameworks).</li>
+                        <li>Contribute to open-source projects to build a stronger portfolio and network.</li>
+                        <li>Complete at least one relevant industry certification (see section 3).</li>
+                    </ul>
                 </div>
-                
-                <!-- Suggestions Card -->
-                <div class="suggestions-card mt-16">
-                    <div class="suggestions-header">
-                        <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
-                        Additional Suggestions
-                    </div>
-                    <div class="suggestions-body">
-                        {{ roadmap.suggestions|linebreaks }}
-                    </div>
+
+                <!-- Medium-term goals -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-3">Medium-term goals (3-5 years)</h3>
+                    <ul>
+                        <li>Become a proficient backend developer with expertise in at least two major frameworks (e.g., Django, Node.js).</li>
+                        <li>Take on increasing responsibility within a team, potentially leading smaller projects.</li>
+                        <li>Explore specialization within backend development (e.g., microservices, cloud technologies).</li>
+                        <li>Consider pursuing a Master's degree (if desired) in a related field.</li>
+                    </ul>
                 </div>
-                
-                <!-- Actions -->
-                <div class="flex justify-between items-center pt-8 no-print">
-                    <a href="{% url 'roadmap:upload_resume' %}" class="action-button upload-button">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                        </svg>
-                        Upload New Resume
-                    </a>
-                    <button onclick="window.print()" class="action-button print-button">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                        </svg>
-                        Print Roadmap
-                    </button>
+
+                <!-- Long-term vision -->
+                <div>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-3">Long-term vision (5+ years)</h3>
+                    <ul>
+                        <li>Lead complex backend development projects, mentoring junior engineers.</li>
+                        <li>Become a technical architect or senior engineer, influencing technological direction within a company.</li>
+                        <li>Potentially start your own venture leveraging backend development skills.</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Animation for milestones on scroll
-    document.addEventListener('DOMContentLoaded', function() {
-        const milestones = document.querySelectorAll('.milestone');
-        
-        function checkScroll() {
-            milestones.forEach((milestone, index) => {
-                const rect = milestone.getBoundingClientRect();
-                if (rect.top < window.innerHeight * 0.8) {
-                    setTimeout(() => {
-                        milestone.style.opacity = '1';
-                        milestone.style.transform = 'translateY(0)';
-                    }, index * 150);
-                }
-            });
-        }
-        
-        // Set initial state
-        milestones.forEach(milestone => {
-            milestone.style.opacity = '0';
-            milestone.style.transform = 'translateY(20px)';
-            milestone.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        });
-        
-        // Check on load and scroll
-        checkScroll();
-        window.addEventListener('scroll', checkScroll);
-    });
-</script>
+    <!-- Skill Development Plan -->
+    <div class="milestone">
+        <div class="milestone-content">
+            <div class="milestone-header">
+                2. SKILL DEVELOPMENT PLAN
+            </div>
+            <div class="milestone-body">
+                <!-- Technical Skills -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-blue-700 mb-3">Technical skills to acquire or improve</h3>
+                    <ul>
+                        <li><strong>Databases:</strong> PostgreSQL, MongoDB (NoSQL experience)</li>
+                        <li><strong>Cloud platforms:</strong> AWS, Google Cloud Platform (GCP), or Azure</li>
+                        <li><strong>API development and integration:</strong> RESTful APIs, GraphQL</li>
+                        <li><strong>Containerization and orchestration:</strong> Docker, Kubernetes</li>
+                        <li><strong>Testing and debugging:</strong> Unit testing, integration testing, debugging tools</li>
+                        <li><strong>Advanced JavaScript frameworks:</strong> React, Angular or Vue.js (for potential full-stack capabilities)</li>
+                    </ul>
+                </div>
+
+                <!-- Soft Skills -->
+                <div>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-3">Soft skills to develop</h3>
+                    <ul>
+                        <li><strong>Communication:</strong> Effectively articulate technical concepts to both technical and non-technical audiences</li>
+                        <li><strong>Teamwork and collaboration:</strong> Strengthen collaborative skills within agile development environments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center gap-4 mt-8">
+        <button class="action-button print-button">
+            <i class="fas fa-print mr-2"></i>
+            Print Roadmap
+        </button>
+        <button class="action-button upload-button">
+            <i class="fas fa-upload mr-2"></i>
+            Update Roadmap
+        </button>
+    </div>
+</div>
 {% endblock %} 
