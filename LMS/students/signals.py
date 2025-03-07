@@ -8,6 +8,10 @@ from .models import StudentProfile
 @receiver(user_signed_up)
 def user_signed_up_signal(request, user, **kwargs):
     """Create a user profile when a new user signs up"""
+    # Check if the registration is coming from instructor paths
+    if request and (request.path.startswith('/instructor/') or 'instructor' in request.GET.get('next', '')):
+        return  # Don't create StudentProfile for instructors
+        
     StudentProfile.objects.get_or_create(
         user=user,
         defaults={
@@ -19,6 +23,10 @@ def user_signed_up_signal(request, user, **kwargs):
 @receiver(pre_social_login)
 def pre_social_login_signal(request, sociallogin, **kwargs):
     """Check if user needs to complete profile on social login"""
+    # Check if this is an instructor login
+    if request and request.path.startswith('/instructor/'):
+        return  # Don't handle student profile for instructors
+        
     if sociallogin.is_existing:
         try:
             user = sociallogin.user
@@ -31,6 +39,10 @@ def pre_social_login_signal(request, sociallogin, **kwargs):
 @receiver(social_account_added)
 def social_account_added_signal(request, sociallogin, **kwargs):
     """Handle new social account connections"""
+    # Check if this is an instructor
+    if request and request.path.startswith('/instructor/'):
+        return  # Don't handle student profile for instructors
+        
     user = sociallogin.user
     profile, created = StudentProfile.objects.get_or_create(
         user=user,
