@@ -1,18 +1,14 @@
+
 {% extends 'base.html' %}
-
 {% load static %}
-
 
 
 
 {% block content %}
     <h1>Instructor Dashboard</h1>
-    <p>mentorship <a href="{% url 'instructor:mentorship_dashboard'%}">Login</a></p>
-    <p>profile <a href="{% url 'instructor:profile'%}">Create Profile</a></p>
-    <p>logout <a href="{% url 'instructor:logout'%}">Logout</a></p>
+    <p>Welcome to your instructor dashboard. Here you can manage your courses, mentorship sessions, and more.</p>
+    <p>mentorship <a href="{% url 'instructor:mentorship_dashboard'%}">Mentorship sessions </a></p>
     
-
-
     
 {% endblock content %}
 

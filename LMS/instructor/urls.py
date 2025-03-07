@@ -11,5 +11,8 @@ urlpatterns = [
     path('mentorship/session/<int:session_id>/', views.session_detail, name='session_detail'),
     path('create-profile/', views.create_profile, name='create_profile'),
     path('edit-profile/', views.edit_profile, name='edit_profile'),
+    path('students/', views.student_list, name='student_list'),
+    path('students/send-request/<int:student_id>/', views.send_friend_request, name='send_friend_request'),
+    path('my-students/', views.my_students, name='my_students'),
 ]
 
