@@ -1,5 +1,19 @@
 {% extends 'students/base.html' %}
 
+{% block extra_head %}
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+
+<!-- CodeMirror JS and its dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="battle-container">
     <div class="question-panel">
@@ -124,11 +138,26 @@
 </style>
 
 <script>
-    // ... (Previous CodeMirror initialization code) ...
-    
+    // Initialize CodeMirror
+    var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+        mode: 'python',
+        theme: 'dracula',
+        lineNumbers: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        lineWrapping: true,
+    });
+
     document.getElementById('submit-code').addEventListener('click', function() {
         const code = editor.getValue();
         const language = document.getElementById('language-select').value;
+        
+        // Disable submit button to prevent multiple submissions
+        this.disabled = true;
+        this.textContent = 'Submitting...';
         
         fetch('{% url "mpcoding:submit_code" room.room_id %}', {
             method: 'POST',
@@ -141,33 +170,53 @@
         .then(response => response.json())
         .then(data => {
             if(data.status === 'success') {
-                document.getElementById('submit-code').disabled = true;
-                document.getElementById('submit-code').textContent = 'Submitted';
-                
-                // Display test results
-                const resultsHtml = data.test_results.map(result => `
-                    <div class="test-result ${result.passed ? 'passed' : 'failed'}">
-                        <div>Input: ${result.input}</div>
-                        <div>Expected: ${result.expected}</div>
-                        <div>Actual: ${result.actual || 'Error'}</div>
-                        ${result.error ? `<div class="error">Error: ${result.error}</div>` : ''}
-                    </div>
-                `).join('');
-                
-                document.querySelector('.test-results').innerHTML = resultsHtml;
+                // Redirect to battle result page
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Error: ' + (data.message || 'Unknown error occurred'));
+                // Re-enable submit button on error
+                this.disabled = false;
+                this.textContent = 'Submit Solution';
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting code: ' + error);
+            // Re-enable submit button on error
+            this.disabled = false;
+            this.textContent = 'Submit Solution';
         });
     });
     
-    // Poll for battle completion
-    setInterval(() => {
+    // Poll for battle completion (for the other player)
+    const pollInterval = setInterval(() => {
         fetch('{% url "mpcoding:check_battle" room.room_id %}')
             .then(response => response.json())
             .then(data => {
                 if (data.completed) {
+                    clearInterval(pollInterval);
                     window.location.href = "{% url 'mpcoding:battle_result' room.room_id %}";
                 }
+            })
+            .catch(error => {
+                console.error('Error polling battle status:', error);
             });
     }, 2000);
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 </script>
 {% endblock %} 

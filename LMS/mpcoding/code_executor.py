@@ -207,4 +207,72 @@ def execute_code(code, language):
             'output': '',
             'error': f'Language {language} is not supported',
             'execution_time': 0
-        } 
+        }
+
+def prepare_test_code(code, language, test_input, function_name=None):
+    """Prepare code with test input based on language"""
+    # Extract function name from code if not provided
+    if not function_name:
+        try:
+            # Look for function definition in the code
+            import re
+            match = re.search(r'def\s+(\w+)\s*\(', code)
+            if match:
+                function_name = match.group(1)
+                print(f"Debug: Extracted function name: {function_name}")
+            else:
+                print("Debug: No function definition found in code")
+                return None
+        except Exception as e:
+            print(f"Debug: Error extracting function name: {e}")
+            return None
+
+    # Convert string input to proper Python literal
+    try:
+        import ast
+        # Safely evaluate the string to get proper Python object
+        test_input = ast.literal_eval(test_input)
+    except Exception as e:
+        print(f"Debug: Error parsing test input: {e}")
+        return None
+
+    if language == 'python':
+        return f"""
+{code}
+
+# Test input
+test_input = '{test_input}'  # String input
+result = {function_name}(test_input)
+print(result)
+"""
+    elif language == 'javascript':
+        return f"""
+{code}
+
+// Test input
+console.log({function_name}('{test_input}'));
+"""
+    elif language == 'java':
+        return f"""
+public class Solution {{
+    {code}
+    
+    public static void main(String[] args) {{
+        Solution solution = new Solution();
+        System.out.println(solution.{function_name}("{test_input}"));
+    }}
+}}"""
+    elif language == 'cpp':
+        return f"""
+#include <iostream>
+#include <string>
+using namespace std;
+
+{code}
+
+int main() {{
+    Solution solution;
+    cout << solution.{function_name}("{test_input}") << endl;
+    return 0;
+}}"""
+    return code 

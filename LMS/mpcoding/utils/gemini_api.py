@@ -29,7 +29,10 @@ def generate_coding_question(difficulty):
         end = response_text.rfind('}') + 1
         if start != -1 and end != 0:
             json_str = response_text[start:end]
-            return json.loads(json_str)
+            question_data = json.loads(json_str)
+            # Add function name to the response
+            question_data['function_name'] = 'is_valid'  # Get this from the question or set appropriately
+            return question_data
         else:
             # Fallback question if API fails
             return {
@@ -40,7 +43,8 @@ def generate_coding_question(difficulty):
                     {"input": "-1, 1", "output": "0"},
                     {"input": "0, 0", "output": "0"}
                 ],
-                "difficulty": difficulty
+                "difficulty": difficulty,
+                "function_name": "is_valid"
             }
     except Exception as e:
         print(f"Error generating question: {e}")
@@ -53,5 +57,6 @@ def generate_coding_question(difficulty):
                 {"input": "-1, 1", "output": "0"},
                 {"input": "0, 0", "output": "0"}
             ],
-            "difficulty": difficulty
+            "difficulty": difficulty,
+            "function_name": "is_valid"
         } 

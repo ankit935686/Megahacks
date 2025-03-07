@@ -30,12 +30,16 @@ class CodingQuestion(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     test_cases = models.JSONField()
+    function_name = models.CharField(max_length=100, null=True, blank=True)
     difficulty = models.CharField(max_length=20, choices=[
         ('easy', 'Easy'),
         ('medium', 'Medium'),
         ('hard', 'Hard')
     ])
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.difficulty})"
 
 class Battle(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
