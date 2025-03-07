@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -153,7 +154,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SITE_ID = 1
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'students:profile_form'
 LOGOUT_REDIRECT_URL = '/'
 
 # Google OAuth2 settings
@@ -197,3 +198,17 @@ LOGGING = {
         },
     },
 }
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Django Allauth settings
+ACCOUNT_ADAPTER = 'students.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'students.adapters.CustomSocialAccountAdapter'
+
+# Additional allauth settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Change this in production
+SOCIALACCOUNT_AUTO_SIGNUP = True

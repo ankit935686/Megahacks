@@ -1,5 +1,7 @@
 {% extends "students/base.html" %}
+
 {% load socialaccount %}
+
 
 {% block content %}
 <div class="auth-container">
@@ -13,7 +15,9 @@
             <input type="password" name="password" placeholder="Password" required>
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
+
     </form>
+    
     
     <div class="social-auth">
         <a href="{% provider_login_url 'google' %}" class="google-btn">
