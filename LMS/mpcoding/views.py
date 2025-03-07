@@ -5,6 +5,9 @@ from django.http import JsonResponse
 from .code_executor import execute_code
 from .utils.gemini_api import generate_coding_question
 import json
+import requests
+from django.urls import reverse
+from .utils.code_evaluator import evaluate_code_with_test_cases
 
 # Create your views here.
 
@@ -87,55 +90,81 @@ def battle_room(request, room_id):
 @login_required
 def submit_code(request, room_id):
     if request.method == 'POST':
-        room = get_object_or_404(Room, room_id=room_id)
-        battle = Battle.objects.get(room=room)
-        code = request.POST.get('code')
-        language = request.POST.get('language', 'python')
-        
-        # Execute code with test cases
-        test_results = evaluate_code_with_test_cases(code, language, battle.question.test_cases)
-        
-        # Store code submission
-        if request.user == room.player1:
-            battle.player1_code = code
-            battle.player1_completed = True
-            battle.player1_results = test_results  # Add this field to Battle model
-        else:
-            battle.player2_code = code
-            battle.player2_completed = True
-            battle.player2_results = test_results  # Add this field to Battle model
-        
-        battle.save()
-        
-        # If both players have submitted, determine winner
-        if battle.player1_completed and battle.player2_completed:
-            determine_winner(battle)
-            room.is_active = False
-            room.save()
-        
-        return JsonResponse({
-            'status': 'success',
-            'test_results': test_results
-        })
+        try:
+            room = get_object_or_404(Room, room_id=room_id)
+            battle = Battle.objects.get(room=room)
+            code = request.POST.get('code')
+            language = request.POST.get('language', 'python')
+            
+            print(f"Debug: Processing submission for {request.user.username}")  # Debug log
+            print(f"Debug: Question function name: {battle.question.function_name}")  # Debug log
+            
+            # Use code_evaluator with function name
+            test_results = evaluate_code_with_test_cases(
+                code, 
+                language, 
+                battle.question.test_cases,
+                battle.question.function_name  # Pass function name
+            )
+            
+            # Store code submission and results
+            if request.user == room.player1:
+                battle.player1_code = code
+                battle.player1_completed = True
+                battle.player1_results = test_results
+            else:
+                battle.player2_code = code
+                battle.player2_completed = True
+                battle.player2_results = test_results
+            
+            battle.save()
+            
+            # If both players have submitted, determine winner
+            if battle.player1_completed and battle.player2_completed:
+                determine_winner(battle)
+                room.is_active = False
+                room.save()
+            
+            return JsonResponse({
+                'status': 'success',
+                'redirect_url': reverse('mpcoding:battle_result', args=[room_id])
+            })
+        except Exception as e:
+            print(f"Debug: Error in submit_code: {str(e)}")  # Debug log
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
     
-    return JsonResponse({'status': 'error'})
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    })
 
 def determine_winner(battle):
     """Determine the winner based on test case results"""
-    p1_score = sum(1 for result in battle.player1_results if result['passed'])
-    p2_score = sum(1 for result in battle.player2_results if result['passed'])
+    p1_score = sum(1 for result in battle.player1_results if result.get('passed', False))
+    p2_score = sum(1 for result in battle.player2_results if result.get('passed', False))
+    
+    print(f"Player 1 score: {p1_score}, Player 2 score: {p2_score}")  # Debug print
     
     if p1_score > p2_score:
         battle.winner = battle.room.player1
     elif p2_score > p1_score:
         battle.winner = battle.room.player2
     # If scores are equal, winner remains None (tie)
+    
     battle.save()
 
 @login_required
 def battle_result(request, room_id):
     room = get_object_or_404(Room, room_id=room_id)
     battle = Battle.objects.get(room=room)
+    
+    # Debug prints
+    print(f"Player 1 results: {battle.player1_results}")
+    print(f"Player 2 results: {battle.player2_results}")
+    print(f"Winner: {battle.winner}")
     
     context = {
         'room': room,

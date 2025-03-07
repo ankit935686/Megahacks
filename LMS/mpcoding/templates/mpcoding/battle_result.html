@@ -8,20 +8,42 @@
         <h3>Problem: {{ battle.question.title }}</h3>
         
         <div class="players-container">
-            <div class="player player1 {% if winner == room.player1 %}winner{% endif %}">
+            <div class="player player1 {% if battle.winner == room.player1 %}winner{% endif %}">
                 <h4>{{ room.player1.username }}</h4>
                 <pre class="code-preview">{{ battle.player1_code }}</pre>
+                <div class="test-results">
+                    <h5>Test Results:</h5>
+                    {% for result in battle.player1_results %}
+                    <div class="test-case {% if result.passed %}passed{% else %}failed{% endif %}">
+                        <p>Input: {{ result.input }}</p>
+                        <p>Expected: {{ result.expected }}</p>
+                        <p>Actual: {{ result.actual }}</p>
+                        <p>Status: {% if result.passed %}✅ Passed{% else %}❌ Failed{% endif %}</p>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
             
-            <div class="player player2 {% if winner == room.player2 %}winner{% endif %}">
+            <div class="player player2 {% if battle.winner == room.player2 %}winner{% endif %}">
                 <h4>{{ room.player2.username }}</h4>
                 <pre class="code-preview">{{ battle.player2_code }}</pre>
+                <div class="test-results">
+                    <h5>Test Results:</h5>
+                    {% for result in battle.player2_results %}
+                    <div class="test-case {% if result.passed %}passed{% else %}failed{% endif %}">
+                        <p>Input: {{ result.input }}</p>
+                        <p>Expected: {{ result.expected }}</p>
+                        <p>Actual: {{ result.actual }}</p>
+                        <p>Status: {% if result.passed %}✅ Passed{% else %}❌ Failed{% endif %}</p>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         
         <div class="winner-announcement">
-            {% if winner %}
-                <h3>Winner: {{ winner.username }}! 🎉</h3>
+            {% if battle.winner %}
+                <h3>Winner: {{ battle.winner.username }}! 🎉</h3>
             {% else %}
                 <h3>It's a tie! 🤝</h3>
             {% endif %}
@@ -99,6 +121,32 @@
     
     .btn:hover {
         background: #0056b3;
+    }
+    
+    .test-results {
+        margin-top: 20px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .test-case {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        background: white;
+    }
+    
+    .test-case.passed {
+        border-left: 4px solid #28a745;
+    }
+    
+    .test-case.failed {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .player.winner .code-preview {
+        border: 2px solid #28a745;
     }
 </style>
 {% endblock %} 
