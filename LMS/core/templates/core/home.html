@@ -203,9 +203,9 @@
           <a href="#how-it-works" class="nav-link text-secondary hover:text-primary font-medium transition-colors duration-200">How It Works</a>
           <a href="#features" class="nav-link text-secondary hover:text-primary font-medium transition-colors duration-200">Why Choose Us</a>
           <div class="ml-4 flex items-center space-x-4">
-            <a href="{% url 'core:login_options' %}" class="text-secondary hover:text-primary font-medium transition-colors duration-200">Log in</a>
             <button class="bg-gradient-to-r from-accent to-[#FF9B2F] text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-200 font-medium">
-              Sign Up Free
+              <a href="{% url 'core:login_options' %}" class="text-secondary hover:text-primary font-medium transition-colors duration-200">Sign up</a>
+
             </button>
           </div>
         </div>
